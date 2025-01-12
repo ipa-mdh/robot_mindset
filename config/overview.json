@@ -1,0 +1,12 @@
+[
+    {
+        "label": "Spark Overview",
+        "icon": "image/settings.svg",
+        "link": "/spark-overview"
+    },
+    {
+        "label": "Changelog",
+        "icon": "image/checklist.svg",
+        "link": "/changelog"
+    }
+]
