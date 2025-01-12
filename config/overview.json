@@ -1,5 +1,9 @@
 [
     {
+        "label": "Robot Model",
+        "icon": "image/precision_manufacturing.svg",
+        "link": ""
+    },{
         "label": "Spark Overview",
         "icon": "image/settings.svg",
         "link": "/spark-overview"
