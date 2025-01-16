@@ -42,7 +42,7 @@
 				"editor.formatOnSave": true //,
 			},
 			// Add the IDs of extensions you want installed when the container is created.
-			"extensions": ['ms-python.python', 'ms-vscode.cpptools-extension-pack', 'ms-vscode.cmake-tools', 'redhat.vscode-xml', 'mhutchie.git-graph', 'ms-azuretools.vscode-docker', 'mtsmfm.vscode-stl-viewer']
+			"extensions": ["ms-python.python", "ms-vscode.cpptools-extension-pack", "ms-vscode.cmake-tools", "redhat.vscode-xml", "mhutchie.git-graph", "ms-azuretools.vscode-docker", "mtsmfm.vscode-stl-viewer"]
 		}
 	},
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
