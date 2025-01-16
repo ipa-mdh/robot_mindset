@@ -1,12 +1,10 @@
 from contextlib import contextmanager
 from nicegui import ui
 
-from gui.menu import menu
-
-
+from robot_mindset.gui.menu import menu
 
 @contextmanager
-def frame(navtitle: str, footer_generator=None):
+def frame(navtitle: str, share_dir, footer_generator=None):
     """Custom page frame to share the same styling and behavior across all pages"""
     ui.colors(primary='#000000',
               secondary='#005C7F',
@@ -19,7 +17,7 @@ def frame(navtitle: str, footer_generator=None):
 )
     with ui.header().classes('justify-between bg-white'):
         with ui.grid(columns=3).classes('gap-1 w-full wrap'):
-            ui.interactive_image('image/robot_mindset.svg', on_mouse=lambda: ui.navigate.to("/"), events=["mouseup"])\
+            ui.interactive_image(share_dir / 'image/robot_mindset.svg', on_mouse=lambda: ui.navigate.to("/"), events=["mouseup"])\
                 .classes('col-span-1 justify-self-start self-start min-w-[150px] max-w-[300px]')
             ui.label(navtitle).classes('col-span-1 justify-self-center text-h4 text-grey-8 nowrap whitespace-nowrap')
             with ui.row().classes('col-span-1 justify-self-end'):

@@ -3,15 +3,15 @@ import json
 
 from nicegui import ui, app
 
-from gui import theme
-from gui.loguru_sink import LoguruSink
-from gui.message import message
+from robot_mindset.gui import theme
+from robot_mindset.gui.loguru_sink import LoguruSink
+from robot_mindset.gui.message import message
 
 cards_data = {}
 
 # Load data from JSON file
-def load_config():
-    with open('config/modules.json', 'r') as file:
+def load_config(share_dir):
+    with open(share_dir / 'config/modules.json', 'r') as file:
         global cards_data
         cards_data = json.load(file)
 
@@ -23,8 +23,8 @@ def save_changes():
     ui.notify('Changes saved successfully!')
 
 # Reload data and rebuild the UI
-def reload_data():
-    load_config()
+def reload_data(share_dir):
+    load_config(share_dir)
     ui.notify('Data reloaded successfully!')
 
 def create_card(card):
@@ -43,8 +43,8 @@ def create_card(card):
                                 .classes('w-full my-json-editor')
 
 # Build the UI
-def content() -> None:
-    load_config()
+def content(share_dir) -> None:
+    load_config(share_dir)
     with ui.grid(columns=2).classes('w-full gap-4'):
         for card in cards_data:
             with ui.card().classes('w-full'):

@@ -1,0 +1,18 @@
+- name: linear axis free drive
+  package: linear_axis_freedrive
+  parameters:
+    - name: axis
+      type: string
+      default: "x"
+      description: "Axis to free drive"
+    - name: speed
+      type: float
+      default: 0.1
+      description: "Speed of free drive"
+- name: behavior tree
+  package: behavior_tree
+  parameters:
+    - name: tree
+      type: string
+      default: "{'type': 'sequence', 'children': [{'type': 'linear_axis_freedrive', 'axis': 'x', 'speed': 0.1}, {'type': 'linear_axis_freedrive', 'axis': 'y', 'speed': 0.1}]}"
+      description: "Behavior tree to execute"
