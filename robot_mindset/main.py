@@ -13,9 +13,9 @@ from robot_mindset.gui import create_pages
 
 class NiceGuiNode(Node):
     def __init__(self):
-        super().__init__('nicegui_node')
-        
         package_name = 'robot_mindset'
+        super().__init__(package_name)
+        
         share_dir = Path(get_package_share_directory(package_name))
 
         with Client.auto_index_client:
