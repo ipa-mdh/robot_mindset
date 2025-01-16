@@ -1,5 +1,5 @@
-from gui import theme
-from gui.message import message
+from robot_mindset.gui import theme
+from robot_mindset.gui.message import message
 
 from nicegui import APIRouter, ui
 

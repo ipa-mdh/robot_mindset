@@ -3,8 +3,8 @@ from pathlib import Path
 from loguru import logger
 from nicegui import ui, app
 
-from gui.loguru_sink import LoguruSink
-from gui.message import message
+from robot_mindset.gui.loguru_sink import LoguruSink
+from robot_mindset.gui.message import message
 
 
 from TROS import Teil2

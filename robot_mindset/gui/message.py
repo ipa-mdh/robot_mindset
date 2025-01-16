@@ -1,6 +1,5 @@
 from nicegui import ui
 
-
 class message(ui.label):
 
     def __init__(self, text: str) -> None:

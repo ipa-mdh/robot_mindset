@@ -3,12 +3,12 @@ import json
 
 from nicegui import ui, app
 
-from gui import theme
-from gui.loguru_sink import LoguruSink
-from gui.message import message
+from robot_mindset.gui import theme
+from robot_mindset.gui.loguru_sink import LoguruSink
+from robot_mindset.gui.message import message
 
 # Build the UI
-def content() -> None:
+def content(share_dir) -> None:
     with ui.timeline(side='right').classes('w-2/3 max-w-[400px]'):
         ui.timeline_entry('Auswahl von Einheiten hinzugefügt.',
                         title='Release 0.4.1',
