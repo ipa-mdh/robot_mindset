@@ -1,35 +1,80 @@
-from loguru import logger
+from pathlib import Path
 import json
+from typing import Dict, Any, Callable, List
+from datetime import datetime
 
-from nicegui import ui, app
+from loguru import logger
+from nicegui import ui
 
-from robot_mindset.gui import theme
-from robot_mindset.gui.loguru_sink import LoguruSink
-from robot_mindset.gui.message import message
+from robot_mindset.utils.config_data import ConfigData
 
-cards_data = {}
+# A callback used to update the grid; it is set later by create_card_grid
+update_grid_callback: Callable[[List[Dict]], None] = None
 
-# Load data from JSON file
-def load_config(share_dir):
-    with open(share_dir / 'config/modules.json', 'r') as file:
-        global cards_data
-        cards_data = json.load(file)
+# ---------------------------------------------------------------------
+# UI Element Creation Functions
+# ---------------------------------------------------------------------
+def create_spark_list(data: ConfigData) -> None:
+    list_of_sparks = data.spark_list
+    # Ensure the config is loaded before creating the list
+    # load_config(data.share_dir)
+    
+    table: ui.Table = None  # type: ignore
 
-# Save changes to JSON file
-def save_changes():
-    with open('config/modules_out.json', 'w') as file:
-        global cards_data
-        json.dump(cards_data, file, indent=4)
-    ui.notify('Changes saved successfully!')
+    def update_rows() -> None:
+        if table:
+            rows = []
+            for idx, spark_name in enumerate(list_of_sparks):
+                buffer = {
+                    'node_name': spark_name,
+                    'date': datetime.now().strftime('%c'),
+                    'id': idx
+                }
+                rows.append(buffer)
+            table.rows = rows
+    
+    # Attach the update_rows callback to the data if needed elsewhere.
+    data.spark_list_callback = update_rows  # type: ignore
 
-# Reload data and rebuild the UI
-def reload_data(share_dir):
-    load_config(share_dir)
-    ui.notify('Data reloaded successfully!')
+    columns = [
+        {'name': 'node_name', 'label': 'Node', 'field': 'node_name',
+         'align': 'left', 'sortable': True, 'filterable': True, 'visible': True},
+        {'name': 'date', 'label': 'Date', 'field': 'date', 'align': 'left',
+         'sortable': True, 'filterable': False, 'visible': False,
+         'classes': 'hidden', 'headerClasses': 'hidden'}
+    ]
+    
+    with ui.row().classes('w-full gap-4'):
+        search_input = ui.input('Search by name').props('clearable').style('flex: 1;')
+        with ui.button(icon='view_column'):
+            with ui.menu(), ui.column().classes('gap-0 p-2'):
+                for column in columns:
+                    ui.switch(
+                        column['label'],
+                        value=column['visible'],
+                        on_change=lambda e, column=column: toggle(column, e.value)
+                    )
+    
+    table = ui.table(
+        columns=columns,
+        rows=[],
+        selection='multiple',
+        pagination=10
+    ).classes('w-full').props('virtual-scroll')
+    
+    def toggle(column: Dict, visible: bool) -> None:
+        column['classes'] = '' if visible else 'hidden'
+        column['headerClasses'] = '' if visible else 'hidden'
+        table.update()
+    
+    search_input.bind_value(table, 'filter')
+    table.on_select(update_grid)
 
-def create_card(card):
-    def update_card_data(data, card=card):
-        card["parameters"] = data.content['json']
+def create_json_editor(card: Dict, style="max-height: 1200px; overflow-y: auto;") -> None:
+    def update_card_data(editor_data) -> None:
+        # Assumes that the json_editor returns a dict with key 'json' inside 'content'
+        card["parameters"] = editor_data.content['json']
+        
     ui.add_css("""
         .my-json-editor {
             /* define a custom theme color */
@@ -37,29 +82,68 @@ def create_card(card):
             --jse-theme-color-highlight: #687177;
         }
     """)
-    editor = ui.json_editor({'content': {'json': card['parameters']},
-                                'mode': "tree"},
-                            on_change=update_card_data) \
-                                .classes('w-full my-json-editor')
+    ui.json_editor(
+        {'content': {'json': card.get('parameters', {})},
+         'mode': "tree"},
+        on_change=update_card_data
+    ).classes('w-full h-max-300 my-json-editor').style(style)
 
-# Build the UI
-def content(share_dir) -> None:
-    load_config(share_dir)
-    with ui.grid(columns=2).classes('w-full gap-4'):
-        for card in cards_data:
-            with ui.card().classes('w-full'):
-                ui.label(f"Name: {card['name']}")
-                ui.label(f"Package: {card['package']}")
-                with ui.dialog() as dialog, ui.card():
-                    create_card(card)
-                    ui.button("Close", on_click=dialog.close).classes('ml-auto')
-                
-                with ui.expansion(f"Parameters").classes('w-full'):
-                    create_card(card)
-                ui.button(icon='settings', on_click=dialog.open).classes('ml-auto')
+def update_grid(selected: Any) -> None:
+    if callable(update_grid_callback):
+        update_grid_callback(selected.selection)
+    # ui.notify(selected.selection)
 
-    # Add a save button
-    ui.button("Save Changes", on_click=save_changes)
+def create_card(card: Dict) -> None:
+    with ui.card().classes('w-full col-span-1'):
+        ui.label(f"Name: {card['name']}")
+        ui.label(f"Package: {card['package']}")
+        with ui.dialog() as dialog, ui.card():
+            create_json_editor(card, style="max-height: 800px; overflow-y: auto;")
+            ui.button("Close", on_click=dialog.close).classes('ml-auto')
+        with ui.expansion("Parameters").classes('w-full'):
+            create_json_editor(card)
+        ui.button(icon='settings', on_click=dialog.open).classes('absolute top-0 right-0 m-2')
 
-    # Add a button to load the data
-    ui.button("Load Data", on_click=load_config)
+def create_card_grid(data: ConfigData) -> None:
+    global update_grid_callback
+    
+    grid = ui.grid(columns=2).classes('w-full gap-4')
+
+    def update_grid(selected: Any) -> None:
+        with grid: 
+            grid.clear()
+            if selected:
+                for entry in selected:
+                    name = entry.get('node_name')
+                    spark_list = data.spark_list
+                    if name in spark_list:
+                        spark = spark_list[name]
+                        if spark.get('parameters'):
+                            params = json.loads(
+                                spark['parameters']
+                                .replace("False", "false")
+                                .replace("True", "true")
+                                .replace("'", '"')
+                            )
+                        else:
+                            ui.notify(f'No parameters for {name} found', type='negative', position='top')
+                            params = {}
+                        create_card({
+                            'name': spark['node_name'],
+                            'package': spark['node_name'],
+                            'parameters': params
+                        })
+    
+    update_grid_callback = update_grid  # type: ignore
+
+# ---------------------------------------------------------------------
+# Assemble the UI using the dataclass
+# ---------------------------------------------------------------------
+def content(data: ConfigData) -> None:
+    with ui.splitter(value=20, limits=(5, 80)).classes('w-full') as splitter:
+        with splitter.before:
+            with ui.column().classes('w-full').style('padding: 15px;'):
+                create_spark_list(data)
+        with splitter.after:
+            with ui.column().classes('w-full').style('padding: 15px;'):
+                create_card_grid(data)

@@ -23,7 +23,7 @@ def frame(navtitle: str, share_dir, footer_generator=None):
             with ui.row().classes('col-span-1 justify-self-end'):
                 menu()
         ui.separator()
-    with ui.grid(columns=1).classes('w-full justify-items-center'):
+    with ui.grid(columns=1).classes('w-full flex-grow justify-items-center'):
         yield
 
     if footer_generator:

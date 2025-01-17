@@ -18,11 +18,11 @@ def footer():
         with ui.scroll_area().style('max-height: 180px;'):
             ui.code(content="Project details", language='plaintext').classes('w-full')
 
-def create(share_dir) -> None:
+def create(data) -> None:
     @ui.page('/')
     def main_page() -> None:
-        with theme.frame('', share_dir, footer):
-            overview.content(share_dir)
+        with theme.frame('', data.share_dir, footer):
+            overview.content(data.share_dir)
             # with ui.column().classes('absolute-center items-center'):
             #     ui.label(f'Hello').classes('text-2xl')
             #     ui.link('b', '/b').classes('text-xl')
@@ -30,8 +30,8 @@ def create(share_dir) -> None:
 
     @ui.page('/changelog')
     def changelog_page():
-        with theme.frame('Changelog', share_dir):
-            changelog.content(share_dir)
+        with theme.frame('Changelog', data.share_dir):
+            changelog.content(data.share_dir)
 
     # @ui.page('/tros2')
     # def tors2_page() -> None:
@@ -45,13 +45,13 @@ def create(share_dir) -> None:
 
     @ui.page('/b')
     def example_page_b():
-        with theme.frame('- Example B -', share_dir):
+        with theme.frame('- Example B -', data.share_dir):
             message('Example B')
             
     @ui.page('/spark-overview')
     def spark_overview_page():
-        with theme.frame('Spark Overview', share_dir, footer):
-            spark_overview.content(share_dir)
+        with theme.frame('Spark Overview', data.share_dir, footer):
+            spark_overview.content(data)
             
     # Create a JSON editor and apply the custom styles
     @ui.page('/json-editor')
