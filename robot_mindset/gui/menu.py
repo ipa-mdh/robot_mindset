@@ -1,7 +1,7 @@
 from nicegui import ui, app
 
 
-def menu() -> None:
+def menu(dark) -> None:
     # def logout() -> None:
     #     app.storage.user.clear()
     #     ui.navigate.to('/login')
@@ -16,6 +16,7 @@ def menu() -> None:
                 ui.menu_item('Home', on_click=lambda: ui.navigate.to('/'))
                 ui.menu_item('Spark Overview', on_click=lambda: ui.navigate.to('/spark-overview'))
                 ui.menu_item('Changelog', on_click=lambda: ui.navigate.to('/changelog'))
+                ui.switch('Dark mode').bind_value(dark)
                 # ui.menu_item('Logout', on_click=logout)
                 # ui.menu_item('Menu item 3 (keep open)',
                 #             lambda: result.set_text('Selected item 3'), auto_close=False)

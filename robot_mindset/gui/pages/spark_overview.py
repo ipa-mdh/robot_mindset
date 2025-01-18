@@ -11,6 +11,12 @@ from robot_mindset.utils.config_data import ConfigData
 # A callback used to update the grid; it is set later by create_card_grid
 update_grid_callback: Callable[[List[Dict]], None] = None
 
+def upload_parameters(set_spark_parameters_fnc, node_name: str, parameters: Dict) -> None:
+    if callable(set_spark_parameters_fnc):
+        set_spark_parameters_fnc(node_name, 'parameters_file', parameters)
+    else:
+        logger.warning('No setter function provided')
+
 # ---------------------------------------------------------------------
 # UI Element Creation Functions
 # ---------------------------------------------------------------------
@@ -69,23 +75,21 @@ def create_spark_list(data: ConfigData) -> None:
     
     search_input.bind_value(table, 'filter')
     table.on_select(update_grid)
+    
+    ui.checkbox('auto refresh').bind_value(data, 'use_heardbeat')
 
-def create_json_editor(card: Dict, style="max-height: 1200px; overflow-y: auto;") -> None:
+def create_json_editor(card: Dict, style="max-height: 400px; overflow-y: auto;") -> None:
     def update_card_data(editor_data) -> None:
         # Assumes that the json_editor returns a dict with key 'json' inside 'content'
         card["parameters"] = editor_data.content['json']
-        
-    ui.add_css("""
-        .my-json-editor {
-            /* define a custom theme color */
-            --jse-theme-color: #000000;
-            --jse-theme-color-highlight: #687177;
-        }
-    """)
+    
+    def get_json_editor_properties(card):
+        return {'content': {'json': card.get('parameters', {})},
+         'mode': "tree"}
+    
     ui.json_editor(
-        {'content': {'json': card.get('parameters', {})},
-         'mode': "tree"},
-        on_change=update_card_data
+        get_json_editor_properties(card),
+        on_change=update_card_data,
     ).classes('w-full h-max-300 my-json-editor').style(style)
 
 def update_grid(selected: Any) -> None:
@@ -93,16 +97,23 @@ def update_grid(selected: Any) -> None:
         update_grid_callback(selected.selection)
     # ui.notify(selected.selection)
 
-def create_card(card: Dict) -> None:
+def create_card(card: Dict, data: ConfigData) -> None:
     with ui.card().classes('w-full col-span-1'):
         ui.label(f"Name: {card['name']}")
         ui.label(f"Package: {card['package']}")
         with ui.dialog() as dialog, ui.card():
-            create_json_editor(card, style="max-height: 800px; overflow-y: auto;")
+            create_json_editor(card, style="max-height: 1200px; overflow-y: auto;")
             ui.button("Close", on_click=dialog.close).classes('ml-auto')
         with ui.expansion("Parameters").classes('w-full'):
             create_json_editor(card)
-        ui.button(icon='settings', on_click=dialog.open).classes('absolute top-0 right-0 m-2')
+        with ui.row().classes('absolute top-0 right-0 m-2'):
+            def on_click_save() -> None:
+                upload_parameters(data.set_spark_parameters_fnc, card['name'], card['parameters'])
+                ui.notify(f"Uploaded {card['name']} parameters", type='positive', position='top')
+                
+            ui.button(icon="cloud_upload",
+                      on_click=on_click_save)
+            ui.button(icon='settings', on_click=dialog.open)
 
 def create_card_grid(data: ConfigData) -> None:
     global update_grid_callback
@@ -132,7 +143,7 @@ def create_card_grid(data: ConfigData) -> None:
                             'name': spark['node_name'],
                             'package': spark['node_name'],
                             'parameters': params
-                        })
+                        }, data)
     
     update_grid_callback = update_grid  # type: ignore
 
