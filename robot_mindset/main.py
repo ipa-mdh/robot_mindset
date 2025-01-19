@@ -35,7 +35,7 @@ class NiceGuiNode(Node):
             share_dir=share_dir,
             spark_list={}, # Initialize an empty dictionary to hold spark registrations
             spark_list_callback=None,  # Will be set by the UI page later
-            get_spark_parameters_fnc=None,
+            # get_spark_parameters_fnc=None,
             set_spark_parameters_fnc=self.update_parameter_value,  # Provide your setter function if needed
             use_heardbeat=True
         )
@@ -51,8 +51,6 @@ class NiceGuiNode(Node):
             # Build the UI pages using the ConfigData object.
             create_pages.create(self.config)
         
-        
-
     def init_service(self):
         self.spark_registration_srv = self.create_service(
             SparkRegistration,
@@ -62,17 +60,6 @@ class NiceGuiNode(Node):
     
     def init_topic(self):
         self.publisher_spark_heardbeat = self.create_publisher(Bool, '/spark_heardbeat', 10)
-
-    # def init_parameter_service(self, node_name: str) -> None:
-    #     # Create clients for the target node's parameter services
-    #     self.get_cli = self.create_client(GetParameters, f'{node_name}/get_parameters')
-    #     self.set_cli = self.create_client(SetParameters, f'{node_name}/set_parameters')
-        
-    #     # Wait for the services to be available
-    #     while not self.get_cli.wait_for_service(timeout_sec=1.0):
-    #         self.get_logger().info('Waiting for get_parameters service...')
-    #     while not self.set_cli.wait_for_service(timeout_sec=1.0):
-    #         self.get_logger().info('Waiting for set_parameters service...')
     
     def update_parameter_value(self, node_name: str, param_name: str, new_value: str):
         print(f'update_parameter_value: {node_name}, {param_name}')
@@ -87,37 +74,8 @@ class NiceGuiNode(Node):
         req.parameters = json.dumps(new_value)
         
         # self.get_logger().info(f'Sending set_parameters request for: {param_name} with new value: {new_value}')
-        self.get_logger().info(f'Sending set_parameters request for: {param_name} with new value: ...')
+        # self.get_logger().info(f'Sending set_parameters request for: {param_name} with new value: ...')
         future = set_cli.call_async(req)
-        
-        self.get_logger().info(f'Future: {future}')
-        
-        # # self.init_parameter_service(node_name)
-        # set_cli = self.create_client(SetParameters, '/my_set_parameters')
-        # while not set_cli.wait_for_service(timeout_sec=1.0):
-        #     self.get_logger().info('Waiting for set_parameters service...')
-        
-        # req = SetParameters.Request()
-        # param_msg = Parameter()
-        # param_msg.name = param_name
-        
-        # # Assume it's a string parameter for this example:
-        # param_value = ParameterValue()
-        # param_value.type = ParameterType.PARAMETER_STRING
-        # param_value.string_value = new_value
-        # param_msg.value = param_value
-        # req.parameters.append(param_msg)
-
-        # self.get_logger().info(f'Sending set_parameters request for: {param_name} with new value: {new_value}')
-        # future = set_cli.call_async(req)
-        # # future.add_done_callback(self.handle_set_response)
-
-    
-    def get_spark_parameters_fnc(self, node_name: str) -> str:
-        # You can uncomment and complete this if you plan to implement a full parameter service interaction.
-        # self.init_parameter_service(node_name)
-        # return self.get_parameter_value
-        return "test"
     
     def timer_callback(self) -> None:
         msg = Bool()
@@ -127,8 +85,6 @@ class NiceGuiNode(Node):
             self.config.spark_list_callback()
         
         self.publisher_spark_heardbeat.publish(msg)
-        # self.get_logger().info('Publishing: "%s"' % msg.data)
-        # self.test()
 
     def spark_registration_callback(self, request, response) -> any:
         # Create a buffer for the incoming spark registration data.
@@ -141,10 +97,6 @@ class NiceGuiNode(Node):
         self.config.spark_list.update({str(request.node_name): buffer})
         
         response.registrated = True
-
-        # Uncomment if you need to trigger the UI update here.
-        # if self.config.spark_list_callback:
-        #     self.config.spark_list_callback()
 
         return response
 
