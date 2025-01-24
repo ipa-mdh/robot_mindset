@@ -7,6 +7,10 @@ repositories:
         type: git
         url: git@github.com:ipa-mdh/spark_example.git
         version: main
+    weld_seam_selector:
+        type: git
+        url: https://gitlab.cc-asp.fraunhofer.de/multirobot/gui/robot_mindset/modules/weld-seam-selector.git
+        version: main    
 
 
 
