@@ -5,7 +5,7 @@
 
 
 # Use the image from the first file
-FROM robot_mindset_base:1.0
+FROM ros:humble
 
 # Set the working directory
 WORKDIR /workspace/src

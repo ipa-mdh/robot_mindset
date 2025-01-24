@@ -20,10 +20,10 @@ RUN chmod +x /workspace/src/robot_mindset/dev-setup/install.sh
 RUN chmod +x /workspace/src/robot_mindset/dev-setup/setup_git_credentials.sh
 
 # Run the installation script
-RUN --mount=type=secret,id=gitcreds,dst=/tmp/.git-credentials \
-    ./src/robot_mindset/dev-setup/setup_git_credentials.sh --git-credentials-file /tmp/.git-credentials
-RUN ./src/robot_mindset/dev-setup/install.sh
-RUN rm -rf ~/.git-credentials
+# RUN --mount=type=secret,id=gitcreds,dst=/tmp/.git-credentials \
+#     ./src/robot_mindset/dev-setup/setup_git_credentials.sh --git-credentials-file /tmp/.git-credentials
+# RUN ./src/robot_mindset/dev-setup/install.sh
+# RUN rm -rf ~/.git-credentials
 
 # Delete the workspace folder after installation to clean up
 RUN rm -rf /workspace
