@@ -5,6 +5,11 @@
         "link": "/spark-overview"
     },
     {
+        "label": "Weld Seam Selector",
+        "icon": "image/weld_seam_selector.svg",
+        "link": "/weld-seam-selector"
+    },
+    {
         "label": "Changelog",
         "icon": "image/checklist.svg",
         "link": "/changelog"

@@ -2,7 +2,7 @@ from nicegui import ui, app
 
 from robot_mindset.gui import theme
 from robot_mindset.gui.message import message
-from robot_mindset.gui.pages import spark_overview, overview, changelog
+from robot_mindset.gui.pages import spark_overview, overview, changelog, weld_seam_selector
 
 # # Add custom CSS for the JSON editor
 # ui.add_css("""
@@ -52,6 +52,11 @@ def create(data) -> None:
     def spark_overview_page():
         with theme.frame('Spark Overview', data.share_dir, footer):
             spark_overview.content(data)
+            
+    @ui.page('/weld-seam-selector')
+    def weld_seam_selector_page():
+        with theme.frame('Weld Seam Selector', data.share_dir, footer):
+            weld_seam_selector.content(data)
             
     # Create a JSON editor and apply the custom styles
     @ui.page('/json-editor')
