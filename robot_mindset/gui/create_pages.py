@@ -2,7 +2,8 @@ from nicegui import ui, app
 
 from robot_mindset.gui import theme
 from robot_mindset.gui.message import message
-from robot_mindset.gui.pages import spark_overview, overview, changelog, weld_seam_selector
+from robot_mindset.gui.pages import spark_overview, overview, changelog
+from weld_seam_selector import weld_seam_selector
 
 # # Add custom CSS for the JSON editor
 # ui.add_css("""
