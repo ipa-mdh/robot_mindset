@@ -1,11 +1,11 @@
 repositories:
     spark_msgs:
         type: git
-        url: git@github.com:ipa-mdh/spark_msgs.git
+        url: https://github.com/ipa-mdh/spark_msgs.git
         version: main
     spark_example:
         type: git
-        url: git@github.com:ipa-mdh/spark_example.git
+        url: https://github.com/ipa-mdh/spark_example.git
         version: main
     weld_seam_selector:
         type: git
