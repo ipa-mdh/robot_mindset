@@ -4,6 +4,7 @@ from robot_mindset.gui import theme
 from robot_mindset.gui.message import message
 from robot_mindset.gui.pages import spark_overview, overview, changelog
 from weld_seam_selector import weld_seam_selector
+from behavior_tree.gui import BehaviorTreeGUI
 
 # # Add custom CSS for the JSON editor
 # ui.add_css("""
@@ -58,6 +59,12 @@ def create(data) -> None:
     def weld_seam_selector_page():
         with theme.frame('Weld Seam Selector', data.share_dir, footer):
             weld_seam_selector.content(data)
+
+    @ui.page('/behavior-tree')
+    def behavior_tree_page():
+        with theme.frame('Behavior Tree', data.share_dir, footer):
+            bt = BehaviorTreeGUI()
+            bt.build_ui()
             
     # Create a JSON editor and apply the custom styles
     @ui.page('/json-editor')

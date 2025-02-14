@@ -10,6 +10,11 @@
         "link": "/weld-seam-selector"
     },
     {
+        "label": "Behavior Tree",
+        "icon": "image/weld_seam_selector.svg",
+        "link": "/behavior-tree"
+    },
+    {
         "label": "Changelog",
         "icon": "image/checklist.svg",
         "link": "/changelog"
